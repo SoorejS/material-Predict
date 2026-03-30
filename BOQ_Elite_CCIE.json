@@ -1,6 +1,7 @@
 {
     "currency": "INR",
     "built_area_sqft": 1200,
+    "soil_type": "hard",
     "segments": {
         "Foundation": {
             "cement_bags": 305.2,
@@ -31,7 +32,6 @@
             "phase": "Finishing (Phase 3)"
         }
     },
-    "materials_summary": {},
     "procurement_advice": [
         {
             "material": "cement",
@@ -47,10 +47,24 @@
         }
     ],
     "uncertainty": {
-        "cost_min": 11022414.01,
-        "cost_max": 13336511.97,
-        "confidence_pct": 90.5,
-        "variance": 9.5
+        "cost_min": 10961516.69,
+        "cost_max": 13397409.29,
+        "confidence_pct": 90.0,
+        "variance": 10.0
     },
+    "optimizations": [
+        {
+            "action": "Switch internal walls to 6-inch partitions",
+            "impact": "High \ud83d\udd25",
+            "est_saving": "\u20b9426,281",
+            "rationale": "Optimizes brick count and room carpet area without affecting load-bearing columns."
+        },
+        {
+            "action": "Downgrade waterproofing to economy bituminous",
+            "impact": "Low \ud83d\udca7",
+            "est_saving": "\u20b9182,692",
+            "rationale": "Hard rocky soil provides natural drainage; premium chemical membrane is over-specified."
+        }
+    ],
     "total_cost": 12179462.99
 }
