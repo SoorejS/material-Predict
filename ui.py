@@ -159,10 +159,10 @@ else:
             for i, advice in enumerate(report["procurement_advice"]):
                 with cols[i]:
                     st.markdown(f"""
-                    <div style='background: rgba(255,255,255,0.02); padding: 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);'>
-                        <span class='recommendation-pill'>{advice['material'].upper()} BUY SIGNAL: {advice['buy_signal']}</span>
+                    <div style='background: rgba(255,255,255,0.02); padding: 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); height: 100%;'>
+                        <span class='recommendation-pill'>{advice['material'].upper()} SIGNAL: {advice['buy_signal']}</span>
                         <h4 style='margin: 10px 0;'>{advice['recommendation']}</h4>
-                        <p style='font-size: 0.9rem; color: #34d399;'>Estimated Saving: {prices['currency']} {advice['potential_savings']:,}</p>
+                        <p style='font-size: 0.9rem; color: #34d399;'>Est. Savings: {prices['currency']} {advice['potential_savings']:,.0f}</p>
                     </div>
                     """, unsafe_allow_html=True)
 
@@ -180,14 +180,15 @@ else:
                 fig_pie = px.pie(timeline_df, values="Cost", names="Segment", hole=0.5, template="plotly_dark")
                 st.plotly_chart(fig_pie, use_container_width=True)
 
-            # 6. Scenario Simulation Comparison
-            st.subheader("🏢 Scenario Analysis Tool")
+            st.subheader("🏢 Scenario Analysis & Benchmarking")
             scenario_df = pd.DataFrame([
-                {"Scenario": "Your Selection", "Cost": report['summary']['total_cost'], "Risk": report['risk_analysis']['category']},
-                {"Scenario": "Standard Soils", "Cost": report['summary']['total_cost'] * 0.9, "Risk": "Low 🟢"},
-                {"Scenario": "Premium Reinforce", "Cost": report['summary']['total_cost'] * 1.25, "Risk": "Medium 🟡"}
+                {"Scenario": "Your Selection", "Cost": f"{sym}{report['summary']['total_cost']:,}", "Risk": report['risk_analysis']['category']},
+                {"Scenario": "Standard Soils", "Cost": f"{sym}{report['summary']['total_cost'] * 0.9:,.0f}", "Risk": "Low 🟢"},
+                {"Scenario": "Premium Reinforce", "Cost": f"{sym}{report['summary']['total_cost'] * 1.25:,.0f}", "Risk": "Medium 🟡"}
             ])
             st.table(scenario_df)
+            
+            st.caption("ℹ️ Benchmarking based on average regional construction rates per built-up sqft.")
 
 # Footer
 st.markdown("<br><hr><center><small><b>CCIE Intelligence Platform v5.0</b> • Powered by Antigravity Decision Engine</small></center>", unsafe_allow_html=True)
