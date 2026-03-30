@@ -1,6 +1,6 @@
 """
-CCIE Elite Central Cost Engine
-Final orchestration engine to reconcile quantities, prices, and items.
+CCIE Elite 6.5 Central Cost Engine
+Final orchestration engine now incorporating the Financial Optimization Node.
 """
 
 import logging
@@ -10,50 +10,50 @@ from engine.time_simulator import TimeSimulator
 from services.procurement import ProcurementAdvisor
 from items.item_costs import ItemCostEstimator
 from engine.uncertainty_engine import UncertaintyEngine
+from services.optimizer import FinancialOptimizer
 
 logger = logging.getLogger(__name__)
 
 class EliteCostEngine:
     """
-    Orchestrates dimensions -> quantities -> prices -> items -> final BOQ.
+    V6.5 Elite Engine: Reconciles geometry, prices, and high-impact optimizations.
     """
     def __init__(self, width: float, length: float, floors: int = 1, soil: str = "hard", nation: str = "global"):
         self.estimator = QuantityEstimator(width, length, floors, soil)
         self.mapper = MaterialMapper()
         self.time_sim = TimeSimulator()
         self.ice = ItemCostEstimator(width * length * floors, floors + 2)
+        self.optimizer = FinancialOptimizer(nation)
         self.nation = nation.lower()
         self.currency = "INR" if self.nation == "india" else "USD"
+        self.soil = soil.lower()
         
     def generate_elite_boq(self, predictive_prices: dict, monthly_drift: float = 0.05) -> dict:
         """
-        Input: Dynamic predictive prices from ML agents.
-        Output: Full Elite Construction Report (v5.0 Ready).
+        Input: Dynamic predictive prices.
+        Output: Full Elite Construction Report with Optimizations (V6.5).
         """
-        # 1. Geometry Analysis
         geom = self.estimator.estimate_segment_geometry()
-        
-        # 2. Lifecycle Price Forecasting
-        # Forecast prices for Foundation (Phase 1), Structural (Phase 2), Finishing (Phase 3)
         future_forecast = self.time_sim.forecast_lifecycle_costs(predictive_prices, monthly_drift)
         
-        foundation_prices = future_forecast["Foundation"]
-        structural_prices = future_forecast["Structural"]
+        found_prices = future_forecast["Foundation"]
+        struct_prices = future_forecast["Structural"]
         
         report = {
           "currency": self.currency,
           "built_area_sqft": geom["total_built_sqft"],
+          "soil_type": self.soil,
           "segments": {},
-          "materials_summary": {},
           "procurement_advice": [],
-          "uncertainty": {}
+          "uncertainty": {},
+          "optimizations": []
         }
         
-        # --- PHASE 1: FOUNDATION ---
+        # --- Phase 1: Foundation ---
         found_mats = self.mapper.concrete_to_mats(geom["foundation_m3"])
-        steel_kg = self.mapper.area_to_steel(self.estimator.area_ft2) * 0.7  # Foundation steel factor
-        found_cost = (found_mats["cement_bags"] * foundation_prices.get("cement", 400)) + \
-                     (steel_kg * foundation_prices.get("steel", 75))
+        steel_kg = self.mapper.area_to_steel(self.estimator.area_ft2) * 0.7 
+        found_cost = (found_mats["cement_bags"] * found_prices.get("cement", 400)) + \
+                     (steel_kg * found_prices.get("steel", 75))
                      
         report["segments"]["Foundation"] = {
           "cement_bags": found_mats["cement_bags"],
@@ -62,15 +62,15 @@ class EliteCostEngine:
           "phase": "Foundation (Phase 1)"
         }
 
-        # --- PHASE 2: WALLS & SLABS ---
+        # --- Phase 2: Walls & Slabs ---
         wall_mats = self.mapper.masonry_to_mats(geom["wall_m3"])
         slab_mats = self.mapper.concrete_to_mats(geom["slab_m3"])
         slab_steel = self.mapper.area_to_steel(self.estimator.area_ft2 * self.estimator.floors)
         
-        structural_cost = (wall_mats["bricks"] * structural_prices.get("bricks", 10.0)) + \
-                          (wall_mats["mortar_cement_bags"] * structural_prices.get("cement", 400)) + \
-                          (slab_mats["cement_bags"] * structural_prices.get("cement", 400)) + \
-                          (slab_steel * structural_prices.get("steel", 75))
+        structural_cost = (wall_mats["bricks"] * struct_prices.get("bricks", 10.0)) + \
+                          (wall_mats["mortar_cement_bags"] * struct_prices.get("cement", 400)) + \
+                          (slab_mats["cement_bags"] * struct_prices.get("cement", 400)) + \
+                          (slab_steel * struct_prices.get("steel", 75))
         
         report["segments"]["Structural Walls & Slab"] = {
           "bricks": wall_mats["bricks"],
@@ -80,29 +80,30 @@ class EliteCostEngine:
           "phase": "Structural (Phase 2)"
         }
 
-        # --- PHASE 3: ITEMS & FINISHING ---
-        items_report = self.ice.estimate_item_costs()
-        # Add Finishing items to segments
-        for item in items_report["items"]:
+        # --- Phase 3: Finishing ---
+        items_rep = self.ice.estimate_item_costs()
+        for item in items_rep["items"]:
             report["segments"][item["name"]] = {
               "qty": item["qty"],
               "cost": item["cost"],
               "phase": "Finishing (Phase 3)"
             }
             
-        # 3. PROCUREMENT INTELLIGENCE
-        # Only advise on core materials like Cement and Steel
-        for mat in ["cement", "steel"]:
-            advisor = ProcurementAdvisor(predictive_prices.get(mat), structural_prices.get(mat), 1.0)
-            advice = advisor.generate_strategy(mat)
-            report["procurement_advice"].append(advice)
-
-        # 4. FINAL PROJECT AGGREGATION & UNCERTAINTY
+        # --- Aggregation ---
         total_project_cost = sum(seg["cost"] for seg in report["segments"].values())
         report["total_cost"] = round(total_project_cost, 2)
         
-        # Uncertainty Engine (assuming 0.3 sentiment)
-        ue = UncertaintyEngine(total_project_cost, 0.3)
+        # --- V6.5 Node: Optimization Engine ---
+        # Map material trends based on monthly drift (positive = up, negative = down/stable)
+        trends = {"cement": monthly_drift, "steel": monthly_drift}
+        report["optimizations"] = self.optimizer.generate_optimizations(report, trends)
+        
+        # Procurement & Uncertainty
+        for mat in ["cement", "steel"]:
+            advisor = ProcurementAdvisor(predictive_prices.get(mat), struct_prices.get(mat), 1.0)
+            report["procurement_advice"].append(advisor.generate_strategy(mat))
+
+        ue = UncertaintyEngine(total_project_cost, 0.4)
         report["uncertainty"] = ue.calculate_range(0.08)
         
         return report

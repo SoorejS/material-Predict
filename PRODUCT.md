@@ -1,54 +1,60 @@
-# 🏗️ Elite CCIE: Construction Cost Intelligence Engine
+# 🏢 CCIE ELITE V6.0: Construction Cost Intelligence Platform
 
-### **The Architect-Grade Estimator & Dynamic Price Hedge**
+### **The Architect-Grade Estimator, Decision Engine, & Dynamic Price Hedge**
 
-**MaterialPrice AI Predictor V4.0 (Elite Edition)** is a production-grade intelligence tool designed to transform static floor plans into dynamic, price-aware construction budgets. 
+**MaterialPrice AI Predictor V6.0 (Elite Edition)** is a production-grade intelligence tool designed to transform static floor plans into dynamic, price-aware construction budgets. 
 
-By merging **Civil Engineering Geometry** with **Predictive ML Data**, this tool provides a "Single Source of Truth" for construction managers and villa developers.
+It has been rebuilt with a **modular, asset-ready architecture** to move construction procurement from manual guesswork to automated **Decision Intelligence.**
 
 ---
 
 ## 🌟 What Does This Product Do?
 
-The **CCIE (Construction Cost Intelligence Engine)** provides a high-fidelity, phase-based estimation for building projects by orchestrating four advanced layers of intelligence:
+The **CCIE (Construction Cost Intelligence Engine)** provides a high-fidelity, multi-phase estimation for building projects by orchestrating six elite layers of intelligence:
 
-1.  **🔍 Geometry Intelligence (`FloorPlanParser`)**: 
-    Decomposes your plot dimensions into actual architectural components (Living, Bedrooms, Kitchen/Baths). It dynamically calculates **internal partition wall lengths**, moving beyond simple area-to-cost models.
+1.  **🔍 Geometry Intelligence Engine (`QuantityEstimator`)**: 
+    Decomposes plot dimensions into architectural components (Perimeter, Room Structure, Slab). It dynamically calculates **internal partition wall lengths** and **foundation depths**, ensuring your material counts are accurate for the specific internal architecture.
 
-2.  **📐 Structural Engineering Rule Engine**: 
-    Uses standardized civil engineering constants (e.g., **350kg cement/m³**, **4.5kg steel/sqft**) to transform building volumes into a precise **Bill of Quantities (BoQ)**. It even adjusts for soil types (Hard/Medium/Soft) to optimize foundation depth.
+2.  **📐 Structural Engineering Rules Engine**: 
+    Uses standardized (but overridable) civil engineering constants (e.g., **350kg cement/m³**, **4.5kg steel/sqft**, **Dry Volume Multipliers [1.54]**) to transform structural volumes into a precise **Bill of Quantities (BoQ).**
 
-3.  **📈 Phase-Based Time Simulation**: 
-    Recognizes that construction takes months. It applies **Predicted Price Drift** across the construction cycle (Month 1 Foundation vs. Month 6 Finishing), ensuring your budget accounts for market volatility during the build.
+3.  **📈 Phase-Based Time-Lifecycle Simulator**: 
+    Recognizes that construction takes months. It forecasts prices across **Month 1-2 (Foundation)**, **Month 3-4 (Structural)**, and **Month 5-6 (Finishing)** windows using news-driven price drift models (ML).
 
-4.  **📉 Uncertainty & Confidence Layer**: 
-    Calculates **Confidence Intervals (±10%)** and provides a **Min/Max Financial Range**. This gives managers a realistic "Safety Buffer" grounded in ML performance metrics.
+4.  **🛍️ Procurement Intelligence Engine**: 
+    Compares current vs future prices to generate automated **BUY/HOLD/WAIT** recommendations. It proactively identifies **Potential Savings** (e.g., ₹1.2 Lakhs) by identifying arbitrage opportunities before price hikes.
+
+5.  **📉 Uncertainty & Confidence Engine**: 
+    Uses model MSE (Mean Squared Error) and news volatility to calculate **Confidence Intervals (±10%)** and provides a **Financial Cost Range (Min/Max).** 
+
+6.  **📋 Elite Central Cost Engine (v6.0)**: 
+    The "Command Center" that reconciles geometry, lifecycle pricing, and **Itemized Architectural Components** (Doors, Windows, Finishing Paints) into a single master BoQ.
 
 ---
 
 ## 🚀 Key Value Propositions
 
-*   **⚡ Predictive BoQ (Bill of Quantities)**: Generates precise material counts (Cement Bags, Steel Kg, Bricks) using **tomorrow's predicted market prices**.
-*   **🏢 Segmented Costing**: Provides a clear financial breakdown for **Foundation, Wall Structural, and Slab** segments.
-*   **🛠️ Live "What-If" Analysis**: Use the sidebar to override engineering standards (e.g., Wall Height, Steel Ratios) and see the impact on total project cost instantly.
-*   **🌍 Multi-Nation Localization**: Native support for **India (INR ₹)**, **UK (GBP £)**, **Europe (EUR €)**, and **Global (USD $)**.
+*   **⚡ Predictive BoQ (Bill of Quantities)**: Generates precise material counts (Cement Bags, Steel Kg, Bricks) using **tomorrow's predicted market prices.**
+*   **🏢 Multi-Phase Financial Split**: Provides a clear financial breakdown for **Foundation, Wall Structural, and Finishing** categories.
+*   **🌍 Multi-Nation Localization**: Native support for **India (INR ₹)**, **USA ($)**, **UK (£)**, and **Europe (€)**.
+*   **💾 Industry-Ready Deliverables**: Automatic export to **Excel and JSON** for seamless integration into enterprise procurement systems.
 
 ---
 
-## 🛠️ Technical Elite Architecture
+## 🛠️ Modular System Architecture
 
-*   **Geometry Engine**: Decomposes floor space into room-aware structural requirements.
-*   **Time Simulator**: Projects expenditures across a 6-month lifecycle using forecasted price trends.
-*   **ML-Price Integration**: Links directly to YFinance and NewsAPI sentiment for dynamic cost data.
-*   **Confidence Predictor**: Uses model MSE (Mean Squared Error) to derive budget variance.
+*   **/engine**: The core algorithmic heavy-lifters (Rules, Estimator, Mapper, Simulator).
+*   **/services**: Advanced decision-makers (Procurement, NLP Sentiment).
+*   **/ui**: V6.0 Elite Executive Dashboard with real-time scenario simulation.
+*   **/utils**: Enterprise-grade exporters and loggers.
 
 ---
 
 ## 🎯 Use Cases
 
-*   **Villa Developers**: Quote accurate, price-protected budgets to clients using real-time market data.
-*   **Procurement Teams**: Schedule material buying based on which construction month provides the best price forecast.
-*   **Project Managers**: Maintain a "Dynamic Contingency Buffer" by tracking the Min/Max confidence range of the project's cost.
+*   **Developers & Promoters**: Quote accurate, price-protected budgets with built-in confidence ranges.
+*   **Architects**: Instantly calculate the material and financial impact of plot design changes.
+*   **Procurement Managers**: Automate buying strategies by tracking ML-forecasted material drifts.
 
 ---
-*Developed for the elite who architect the future.*
+*Developed for the elite who architect the future of construction.*

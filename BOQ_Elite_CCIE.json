@@ -1,0 +1,56 @@
+{
+    "currency": "INR",
+    "built_area_sqft": 1200,
+    "segments": {
+        "Foundation": {
+            "cement_bags": 305.2,
+            "steel_kg": 1889.9999999999998,
+            "cost": 3977432.56,
+            "phase": "Foundation (Phase 1)"
+        },
+        "Structural Walls & Slab": {
+            "bricks": 50161,
+            "cement_bags": 465.2,
+            "steel_kg": 5400.0,
+            "cost": 7978030.43,
+            "phase": "Structural (Phase 2)"
+        },
+        "Exterior Windows": {
+            "qty": 6,
+            "cost": 33000.0,
+            "phase": "Finishing (Phase 3)"
+        },
+        "Internal Doors": {
+            "qty": 4,
+            "cost": 56000.0,
+            "phase": "Finishing (Phase 3)"
+        },
+        "Internal Painting": {
+            "qty": 3000.0,
+            "cost": 135000.0,
+            "phase": "Finishing (Phase 3)"
+        }
+    },
+    "materials_summary": {},
+    "procurement_advice": [
+        {
+            "material": "cement",
+            "strategy": "BUY_NOW \ud83d\udd25",
+            "recommendation": "Immediate purchase advised. Predicted 18.6% price hike in next phase.",
+            "est_savings": 2031.61
+        },
+        {
+            "material": "steel",
+            "strategy": "BUY_NOW \ud83d\udd25",
+            "recommendation": "Immediate purchase advised. Predicted 18.6% price hike in next phase.",
+            "est_savings": 36.16
+        }
+    ],
+    "uncertainty": {
+        "cost_min": 11022414.01,
+        "cost_max": 13336511.97,
+        "confidence_pct": 90.5,
+        "variance": 9.5
+    },
+    "total_cost": 12179462.99
+}
