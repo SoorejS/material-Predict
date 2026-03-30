@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from app.agent import CommodityPredictionAgent, MATERIAL_MAP
+from app.agent import CommodityPredictionAgent, MATERIAL_DATABASE
 import datetime
 
 # --- UI Config ---
@@ -41,21 +41,28 @@ with st.sidebar:
     # Material selection
     selected_material = st.selectbox(
         "Select Material",
-        options=list(MATERIAL_MAP.keys()),
+        options=list(MATERIAL_DATABASE.keys()),
         index=0,
         help="Select a construction material or commodity for prediction."
     )
     
+    selected_nation = st.selectbox(
+        "Select Nation",
+        options=["Global", "India", "UK", "Europe"],
+        index=1,  # Default to India based on user context
+        help="Adjusts ticker selection and currency (e.g., INR for India)."
+    )
+
     st.divider()
-    st.info("💡 **How it works:** Analyzes 3 months of YFinance data + real-time news sentiment via LLM analysis.")
+    st.info("💡 **How it works:** Analyzes 3 months of YFinance data + local currency exchange rates + real-time news sentiment.")
 
 # --- Main Dashboard ---
 st.markdown(f"<h1 class='header-text'>🏗️ {selected_material.upper()} PRICE PREDICTOR</h1>", unsafe_allow_html=True)
 
-if st.button("🚀 Run Prediction Agent"):
-    with st.spinner("Analyzing market patterns & news sentiment..."):
+if st.button(f"🚀 Run Prediction Agent for {selected_nation}"):
+    with st.spinner(f"Analyzing {selected_material} {selected_nation} market patterns..."):
         # Run prediction agent
-        agent = CommodityPredictionAgent(selected_material)
+        agent = CommodityPredictionAgent(selected_material, nation=selected_nation)
         result = agent.run_prediction_pipeline()
 
         if result.get("success"):
@@ -68,9 +75,10 @@ if st.button("🚀 Run Prediction Agent"):
                     value=result["symbol"]
                 )
             with col2:
+                currency_symbol = "₹" if result['currency'] == "INR" else ("$" if result['currency'] == "USD" else ("£" if result['currency'] == "GBP" else "€"))
                 st.metric(
-                    label="Next Day Prediction",
-                    value=f"${result['predicted_price']:.2f}"
+                    label=f"Next Day Prediction ({result['currency']})",
+                    value=f"{currency_symbol}{result['predicted_price']:,}"
                 )
             with col3:
                 sentiment = result["current_sentiment"]
@@ -84,7 +92,7 @@ if st.button("🚀 Run Prediction Agent"):
             st.divider()
 
             # 2. Historical Chart
-            st.subheader(f"📊 90-Day Price Movement ({result['symbol']})")
+            st.subheader(f"📊 90-Day Price Movement ({result['symbol']} in {result['currency']})")
             df_hist = result["historical_data"]
             
             fig = go.Figure()
