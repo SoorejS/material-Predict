@@ -3,192 +3,184 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from app.agent import CommodityPredictionAgent, MATERIAL_DATABASE
-from app.engine.cost_engine import ConstructionCostEngine
+from engine.cost_engine import EliteCostEngine
+from utils.export import BOQExporter
 import datetime
+import os
 
 # --- UI Config ---
 st.set_page_config(
-    page_title="CCIE V5.0 | Decision Intelligence Platform",
-    page_icon="🧠",
+    page_title="CCIE ELITE | Advanced Construction Intelligence",
+    page_icon="🏗️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- V5.0 Elite Styling ---
+# --- Modern Styling ---
 st.markdown("""
     <style>
-    .main { background-color: #0d1117; }
+    .main { background-color: #0e1117; }
     .stMetric {
         background: rgba(255, 255, 255, 0.05);
-        padding: 20px;
+        padding: 22px;
         border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.12);
     }
     .header-text {
-        font-family: 'Outfit', sans-serif;
+        font-family: 'Inter', sans-serif;
         font-weight: 800;
-        letter-spacing: -1px;
         color: #ffffff;
-        margin-bottom: 0px;
+        margin-bottom: 2px;
     }
-    .subheader-text { color: #8b949e; margin-bottom: 25px; font-size: 1.1rem; }
-    .status-card {
-        background: rgba(30, 41, 59, 0.7);
-        padding: 25px;
-        border-radius: 15px;
-        border-left: 5px solid #3b82f6;
-        margin-bottom: 20px;
-    }
-    .risk-badge {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 800;
-        text-transform: uppercase;
-    }
-    .recommendation-pill {
-        background: #064e3b;
-        color: #34d399;
-        padding: 4px 10px;
-        border-radius: 5px;
-        font-size: 0.8rem;
-        font-weight: bold;
+    .subheader-text { color: #888; font-size: 1.1rem; margin-bottom: 25px; }
+    .advice-card {
+        background: rgba(30,41,59,0.6);
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 5px solid #22c55e;
+        margin-bottom: 15px;
     }
     </style>
     """, unsafe_allow_html=True)
 
 # --- Sidebar ---
 with st.sidebar:
-    st.image("https://img.icons8.com/isometric/512/brain.png", width=70)
-    st.title("CCIE V5.0")
+    st.image("https://img.icons8.com/isometric/512/construction-crane.png", width=80)
+    st.title("CCIE ELITE V6.0")
     
-    app_mode = st.radio("Intelligence Mode", ["Price Analysis", "Decision Intelligence (V5.0 Elite)"])
+    app_mode = st.radio("System Mode", ["Market Analysis", "Elite BOQ Estimator"])
     
     st.divider()
     
     selected_nation = st.selectbox(
         "Market Region",
-        options=["Global", "India", "UK", "Europe"],
-        index=1
+        options=["India", "USA", "UK", "Europe"],
+        index=0
     )
 
     st.divider()
-    if app_mode == "Decision Intelligence (V5.0 Elite)":
+    if app_mode == "Elite BOQ Estimator":
         st.subheader("📐 Project Geometry")
         plot_w = st.number_input("Width (ft)", value=20)
         plot_l = st.number_input("Length (ft)", value=30)
         floors = st.number_input("Floors", value=2, min_value=1)
-        soil = st.selectbox("Soil Profile", ["Hard", "Medium", "Soft"])
+        soil = st.selectbox("Soil Type", ["Hard", "Medium", "Soft"])
         
-        with st.expander("🛠️ Decision Factors"):
-            c_ratio = st.number_input("Cement (kg/m³)", value=350, step=10)
-            s_ratio = st.number_input("Steel (kg/sqft)", value=4.5, step=0.1)
-            time_drift = st.slider("Forecast Monthly Drift (%)", 0.0, 10.0, 5.0) / 100.0
+        with st.expander("🛠️ Advanced Simulation"):
+            st.caption("Override design assumptions")
+            c_ratio = st.number_input("Cement/m3 (kg)", value=350, step=10)
+            s_ratio = st.number_input("Steel/sqft (kg)", value=4.5, step=0.1)
+            time_drift = st.slider("Forecast Drift (%)", 0.0, 10.0, 5.0) / 100.0
     else:
-        selected_material = st.selectbox("Select Material", list(MATERIAL_DATABASE.keys()))
+        selected_material = st.selectbox("Predict Asset", list(MATERIAL_DATABASE.keys()))
 
 # --- Main Dashboard ---
 
-if app_mode == "Price Analysis":
-    st.markdown(f"<h1 class='header-text'>🏗️ MARKET INTELLIGENCE: {selected_material.upper()}</h1>", unsafe_allow_html=True)
-    st.markdown("<p class='subheader-text'>Phase-aware trend forecasting into the next 90 days.</p>", unsafe_allow_html=True)
+if app_mode == "Market Analysis":
+    st.markdown(f"<h1 class='header-text'>🏗️ MARKET ANALYSIS: {selected_material.upper()}</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='subheader-text'>Real-time volatility and news sentiment prediction.</p>", unsafe_allow_html=True)
 
-    if st.button(f"🚀 Execute Sentiment Analysis"):
-        with st.spinner("Analyzing world markets..."):
-            agent = CommodityPredictionAgent(selected_material, nation=selected_nation)
+    if st.button("🚀 Analyze Market Sentiment"):
+        with st.spinner("Processing news and history..."):
+            agent = CommodityPredictionAgent(selected_material, nation=selected_nation.lower())
             result = agent.run_prediction_pipeline()
 
             if result.get("success"):
                 c1, c2, c3 = st.columns(3)
                 sym = "₹" if result['currency'] == "INR" else "$"
-                c1.metric("Asset Ticker", result["symbol"])
-                c2.metric("Next-Day Target", f"{sym}{result['predicted_price']:,}")
+                c1.metric("Asset Sym", result["symbol"])
+                c2.metric("Predicted Target", f"{sym}{result['predicted_price']:,}")
                 sent = result["current_sentiment"]
-                c3.metric("Sentiment Index", "Positive 🔥" if sent > 0.1 else "Neutral ☁️", delta=f"{sent:.2f}")
+                c3.metric("Sentiment", "Positive 🔥" if sent > 0.1 else "Neutral ☁️", delta=f"{sent:.2f}")
 
                 st.divider()
                 df_hist = result["historical_data"]
-                fig = px.line(df_hist, x="Date", y="Close", title="Historical Volatility (90D)",
-                             template="plotly_dark", color_discrete_sequence=['#3b82f6'])
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=df_hist['Date'], y=df_hist['Close'], fill='tozeroy', line=dict(color='#ff4b4b')))
+                fig.update_layout(template="plotly_dark", margin=dict(l=0,r=0,t=20,b=0))
                 st.plotly_chart(fig, use_container_width=True)
             else:
-                st.error("Data Fetch Failed.")
+                st.error("Market Analysis Failed.")
 
 else:
-    # V5.0 DECISION INTELLIGENCE
-    st.markdown("<h1 class='header-text'>🧠 DECISION INTELLIGENCE PLATFORM</h1>", unsafe_allow_html=True)
-    st.markdown(f"<p class='subheader-text'>Simulating {plot_w}x{plot_l} {floors}-Floor Project in {selected_nation}.</p>", unsafe_allow_html=True)
+    # ELITE BOQ ESTIMATOR
+    st.markdown("<h1 class='header-text'>🧠 ELITE PROJECT ESTIMATOR (CCIE)</h1>", unsafe_allow_html=True)
+    st.markdown(f"<p class='subheader-text'>Predictive BOQ for {plot_w}x{plot_l} {floors}-Floor Project in {selected_nation}.</p>", unsafe_allow_html=True)
 
-    if st.button("🏗️ Run Executive Decision Simulation"):
-        with st.spinner("Analyzing Procurement Arbitrage & Risk Benchmarks..."):
-            # 1. Fetch Dynamic Market Data
-            agent_c = CommodityPredictionAgent("cement", nation=selected_nation)
-            agent_s = CommodityPredictionAgent("steel", nation=selected_nation)
-            p_cement = agent_c.run_prediction_pipeline()["predicted_price"]
-            p_steel = agent_s.run_prediction_pipeline()["predicted_price"]
-            
-            # 2. Execute V5.0 Decision Engine
-            engine = ConstructionCostEngine(plot_w, plot_l, floors, soil, nation=selected_nation)
-            engine.estimator.rules["m3_concrete"]["cement_kg"] = c_ratio
-            engine.estimator.rules["structural"]["steel_kg_per_sqft"] = s_ratio
-            
-            prices = {"cement": p_cement, "steel": p_steel, "currency": "INR" if selected_nation == "India" else "USD"}
-            report = engine.calculate_project_costs(prices, monthly_drift=time_drift)
-            
-            # 3. EXECUTIVE CARD: Decision & Benchmarking
-            st.markdown(f"""
-            <div class='status-card'>
-                <div style='display: flex; justify-content: space-between; align-items: start;'>
-                    <div>
-                        <span class='risk-badge' style='background: #1e293b; color: #fff;'>MARKET STATUS</span>
-                        <h2 style='margin: 10px 0;'>{report['risk_analysis']['status']}</h2>
-                        <p style='color: #8b949e;'>Current Estimate: <b>{report['summary']['currency']} {report['risk_analysis']['cost_per_sqft']}/sqft</b> 
-                        (Standard: {report['risk_analysis']['market_benchmark']}/sqft)</p>
-                    </div>
-                    <div style='text-align: right;'>
-                        <span class='risk-badge' style='background: {'#ef4444' if 'High' in report['risk_analysis']['category'] else '#10b981'};'>Project Risk: {report['risk_analysis']['category']}</span>
-                        <h2 style='margin: 10px 0;'>{prices['currency']} {report['summary']['total_cost']:,}</h2>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+    if st.button("🏗️ Run Full Project Simulation"):
+        with st.spinner("Executing Architecture-Level Simulation..."):
+            # 1. Fetch Dynamic Predictive Prices for core materials
+            # We predict Cement and Steel as core drivers
+            try:
+                agent_c = CommodityPredictionAgent("cement", nation=selected_nation.lower())
+                agent_s = CommodityPredictionAgent("steel", nation=selected_nation.lower())
+                
+                prices = {
+                    "cement": agent_c.run_prediction_pipeline()["predicted_price"],
+                    "steel": agent_s.run_prediction_pipeline()["predicted_price"],
+                    "bricks": 12.0  # Base bricks cost (Standard)
+                }
+                
+                # 2. Run Elite Cost Engine
+                engine = EliteCostEngine(plot_w, plot_l, floors, soil, nation=selected_nation.lower())
+                
+                # Apply Simulation Overrides
+                engine.estimator.rules["concrete"]["cement_kg_per_m3"] = c_ratio
+                engine.estimator.rules["structural"]["steel_kg_per_sqft"] = s_ratio
+                
+                report = engine.generate_elite_boq(prices, monthly_drift=time_drift)
+                
+                # 3. High-Level Financials
+                c1, c2, c3, c4 = st.columns(4)
+                sym = "₹" if report['currency'] == "INR" else "$"
+                c1.metric("Predicted Project Cost", f"{sym}{report['total_cost']:,}")
+                c2.metric("Cost Range (Min/Max)", f"{sym}{report['uncertainty']['cost_min']:,} - {sym}{report['uncertainty']['cost_max']:,}")
+                c3.metric("Confidence Level", f"{report['uncertainty']['confidence_pct']}%")
+                c4.metric("Built Area", f"{report['built_area_sqft']:,} sqft")
+                
+                st.divider()
 
-            # 4. PROCUREMENT ADVISOR CARD
-            st.subheader("🛍️ Procurement Advisor")
-            cols = st.columns(len(report["procurement_advice"]))
-            for i, advice in enumerate(report["procurement_advice"]):
-                with cols[i]:
-                    st.markdown(f"""
-                    <div style='background: rgba(255,255,255,0.02); padding: 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); height: 100%;'>
-                        <span class='recommendation-pill'>{advice['material'].upper()} SIGNAL: {advice['buy_signal']}</span>
-                        <h4 style='margin: 10px 0;'>{advice['recommendation']}</h4>
-                        <p style='font-size: 0.9rem; color: #34d399;'>Est. Savings: {prices['currency']} {advice['potential_savings']:,.0f}</p>
-                    </div>
-                    """, unsafe_allow_html=True)
+                # 4. Procurement Cards
+                st.subheader("🛍️ Automated Procurement Strategy")
+                cols = st.columns(len(report["procurement_advice"]))
+                for i, advice in enumerate(report["procurement_advice"]):
+                    with cols[i]:
+                        st.markdown(f"""
+                        <div class='advice-card'>
+                            <span style='font-size: 0.8rem; font-weight: bold;'>{advice['material'].upper()} SIGNAL: {advice['strategy']}</span>
+                            <h4 style='margin: 10px 0;'>{advice['recommendation']}</h4>
+                            <p style='color: #22c55e; font-size: 0.9rem;'>Potential Saving: {sym}{advice['est_savings']:,}</p>
+                        </div>
+                        """, unsafe_allow_html=True)
+                
+                st.divider()
 
-            st.divider()
-            
-            # 5. Visual Analytics (Charts)
-            c_left, c_right = st.columns([2, 1])
-            with c_left:
-                st.subheader("📈 Project Expenditure Timeline")
-                timeline_df = pd.DataFrame([{"Segment": k, "Cost": v["cost"], "Phase": v["phase"]} for k,v in report["segments"].items()])
-                fig_bar = px.bar(timeline_df, x="Segment", y="Cost", color="Phase", template="plotly_dark", barmode='group')
-                st.plotly_chart(fig_bar, use_container_width=True)
-            with c_right:
-                st.subheader("🍰 Financial Split")
-                fig_pie = px.pie(timeline_df, values="Cost", names="Segment", hole=0.5, template="plotly_dark")
-                st.plotly_chart(fig_pie, use_container_width=True)
+                # 5. Visual Breakdown Charts
+                left_col, right_col = st.columns([2, 1])
+                with left_col:
+                    st.subheader("🏢 Structural Expenditure Chart")
+                    seg_data = [{"Segment": k, "Cost": v["cost"], "Phase": v["phase"]} for k,v in report["segments"].items()]
+                    df_seg = pd.DataFrame(seg_data)
+                    fig_bar = px.bar(df_seg, x="Segment", y="Cost", color="Phase", template="plotly_dark", barmode='group')
+                    st.plotly_chart(fig_bar, use_container_width=True)
+                with right_col:
+                    st.subheader("🍰 Financial Split")
+                    fig_pie = px.pie(df_seg, values="Cost", names="Segment", hole=0.5, template="plotly_dark")
+                    st.plotly_chart(fig_pie, use_container_width=True)
 
-            st.subheader("🏢 Scenario Analysis & Benchmarking")
-            scenario_df = pd.DataFrame([
-                {"Scenario": "Your Selection", "Cost": f"{sym}{report['summary']['total_cost']:,}", "Risk": report['risk_analysis']['category']},
-                {"Scenario": "Standard Soils", "Cost": f"{sym}{report['summary']['total_cost'] * 0.9:,.0f}", "Risk": "Low 🟢"},
-                {"Scenario": "Premium Reinforce", "Cost": f"{sym}{report['summary']['total_cost'] * 1.25:,.0f}", "Risk": "Medium 🟡"}
-            ])
-            st.table(scenario_df)
-            
-            st.caption("ℹ️ Benchmarking based on average regional construction rates per built-up sqft.")
+                # 6. Detailed BOQ Data Table
+                st.subheader("📋 Segmented Bill of Quantities")
+                st.table(df_seg)
+                
+                # 7. EXPORT Deliverable
+                st.subheader("💾 Export Deliverables")
+                exporter = BOQExporter(report)
+                json_path = exporter.export_json()
+                with open(json_path, 'r') as f:
+                    st.download_button("📩 Download Final BOQ (JSON)", data=f, file_name=json_path)
+
+            except Exception as e:
+                st.error(f"Engine Simulation Failed: {str(e)}")
 
 # Footer
-st.markdown("<br><hr><center><small><b>CCIE Intelligence Platform v5.0</b> • Powered by Antigravity Decision Engine</small></center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center><small><b>CCIE ELITE v6.0</b> • Advanced Construction Cost Intelligence Platform</small></center>", unsafe_allow_html=True)
