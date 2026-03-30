@@ -16,18 +16,20 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Predict prices for construction materials or commodities.")
     parser.add_argument("--material", type=str, default="gold", help="Material name (cement, pvc, land, steel, gold, etc.)")
+    parser.add_argument("--nation", type=str, default="global", help="Nation for currency and local data (india, uk, europe, global)")
     
     args = parser.parse_args()
 
     # Predict commodity price
-    agent = CommodityPredictionAgent(args.material)
+    agent = CommodityPredictionAgent(args.material, nation=args.nation)
     prediction_result = agent.run_prediction_pipeline()
 
     if prediction_result.get("success"):
+        currency_symbol = "₹" if prediction_result['currency'] == "INR" else ("$" if prediction_result['currency'] == "USD" else ("£" if prediction_result['currency'] == "GBP" else "€"))
         print("\n" + "="*50)
-        print(f"🏗️  Material: {prediction_result['material'].upper()}")
+        print(f"🏗️  Material: {prediction_result['material'].upper()} [{prediction_result['nation'].upper()}]")
         print(f"📊 Proxy Ticker: {prediction_result['symbol']}")
-        print(f"💰 Predicted Next Price: {prediction_result['predicted_price']}")
+        print(f"💰 Predicted Price: {currency_symbol}{prediction_result['predicted_price']:,}")
         print(f"📰 Market Sentiment Score: {prediction_result['current_sentiment']}")
         print(f"⚠️  Model: {prediction_result['model_type']}")
         print("="*50 + "\n")

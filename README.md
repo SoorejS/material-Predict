@@ -8,6 +8,12 @@ This project provides a production-level AI agent for predicting prices of **con
 *   **🔵 PVC**: `WLK` (Westlake Corp)
 *   **🌳 Land/Real Estate**: `VNQ` (Vanguard Real Estate ETF)
 *   **🏗️ Steel/Rebar**: `NUE` (Nucor) / `SR=F`
+*   **🪜 Aluminum**: `AA` (Alcoa)
+*   **🛢️ Bitumen**: `VMC` (Asphalt proxy)
+*   **💧 Waterproofing**: `CSL` (Carlisle Companies)
+*   **🏠 Insulation**: `OC` (Owens Corning)
+*   **🪟 Glass**: `TGLS` (Architectural Glass)
+*   **🧴 Sealants/Coatings**: `RPM` (RPM International)
 *   **🪵 Lumber**: `LBS=F`
 *   **💰 Commodities**: Gold (`GC=F`), Oil (`CL=F`), Silver (`SI=F`)
 
